@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  # this service should use the web image after you build it
+  web:
+    build:
+      context: ./welcome-app
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8084"
+    restart: always
