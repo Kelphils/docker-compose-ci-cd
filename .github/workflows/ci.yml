@@ -2,17 +2,16 @@ name: Docker-Compose-Deployment
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
   pull_request:
-    branches: [master]
-
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
 
     strategy:
       matrix:
@@ -20,10 +19,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      #   - run: npm ci
-      #   - run: npm run build
-      #   - run: npm run test
 
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
@@ -34,3 +29,10 @@ jobs:
           remote_host: "${{ secrets.EC2_REMOTE_HOST }}"
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
+
+      - name: Docker Compose Up
+        uses: hoverkraft-tech/compose-action@v1.5.1
+        with:
+          compose-file: "docker-compose.yml"
+          up-flags: "--force-recreate -d --build"
+          down-flags: ""
